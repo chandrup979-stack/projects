@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PowerLoom Production System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at top, #1b2a49, #0f172a);
+            color: white;
+        }
+
+        /* ========== FRONT PAGE ========== */
+        #logoScreen {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .front-image {
+            width: 260px;
+            border-radius: 18px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .front-image:hover {
+            transform: scale(1.05);
+        }
+
+        #logoScreen h1 {
+            margin-top: 20px;
+            font-size: 28px;
+        }
+
+        #logoScreen p {
+            opacity: 0.85;
+        }
+
+        /* ========== SETUP PAGE ========== */
+        #setup {
+            display: none;
+            min-height: 10vh;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .setup-box {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 25px;
+            width: 420px;
+        }
+
+        .setup-box h2 {
+            text-align: center;
+        }
+
+        .setup-box label {
+            display: block;
+            margin-top: 15px;
+        }
+
+        .setup-box input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            margin-top: 5px;
+        }
+
+        .setup-box button {
+            margin-top: 25px;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #86d346, #3665ca);
+            color: rgb(70, 188, 204);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* ========== DASHBOARD ========== */
+        #dashboard {
+            display: none;
+            padding: 25px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(14px);
+            padding: 25px;
+            border-radius: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th {
+            background: linear-gradient(135deg, #4accdd, #9bb913);
+            padding: 12px;
+        }
+
+        td {
+            background: rgba(255, 255, 255, 0.9);
+            color: rgb(24, 7, 102);
+            padding: 10px;
+            text-align: center;
+        }
+
+        td input {
+            width: 80px;
+        }
+
+        button.calc {
+            margin-top: 20px;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #0bc056f5, #d97706);
+            color: rgb(243, 242, 242);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #0ea5e9, #bcc94a);
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ========== FRONT PAGE ========== -->
+    <section id="logoScreen" onclick="goToSetup()">
+
+        <img src="https://s.alicdn.com/@sc04/kf/Hd84df5966e11454091b2d2ccce66b720a/Air-Jet-Power-Loom-Price-in-Pakistan-India-With-Jacquard-170cm-190cm-Towel-Air-Jet-Loom-Automatic-Machine-With-Mechanical-Dobby.jpg_300x300.jpg"
+            alt="Power Loom Machine" class="front-image">
+
+        <h1>PowerLoom Production System</h1>
+        <p>Tap the Machine to Start</p>
+
+    </section>
+
+    <!-- ========== SETUP PAGE ========== -->
+    <section id="setup">
+        <div class="setup-box">
+            <h2>🏭 PowerLoom Setup</h2>
+
+            <label>Number of Machines</label>
+            <input type="number" id="machines" value="12">
+
+            <label>Metres per Bundle</label>
+            <input type="number" id="metres" value="80">
+
+            <label>Rate per Metre (₹)</label>
+            <input type="number" id="rate" value="6">
+
+            <button onclick="startDashboard()">Proceed to Dashboard</button>
+        </div>
+    </section>
+
+    <!-- ========== DASHBOARD ========== -->
+    <section id="dashboard">
+        <h2 style="text-align:center;">🏭 Production Dashboard</h2>
+
+        <div class="container">
+            <table id="table">
+                <tr>
+                    <th>Machine</th>
+                    <th>Bundles</th>
+                    <th>Amount (₹)</th>
+                </tr>
+            </table>
+
+            <button class="calc" onclick="calculate()">CALCULATE</button>
+            <div class="result" id="result"></div>
+        </div>
+    </section>
+
+    <script>
+        let MACHINE_COUNT, METRES, RATE;
+
+        function goToSetup() {
+            document.getElementById("logoScreen").style.display = "none";
+            document.getElementById("setup").style.display = "flex";
+        }
+
+        function startDashboard() {
+            MACHINE_COUNT = Number(document.getElementById("machines").value);
+            METRES = Number(document.getElementById("metres").value);
+            RATE = Number(document.getElementById("rate").value);
+
+            document.getElementById("setup").style.display = "none";
+            document.getElementById("dashboard").style.display = "block";
+
+            const table = document.getElementById("table");
+            table.innerHTML = `
+                <tr>
+                    <th>Machine</th>
+                    <th>Bundles</th>
+                    <th>Amount (₹)</th>
+                </tr>
+            `;
+
+            for (let i = 1; i <= MACHINE_COUNT; i++) {
+                table.innerHTML += `
+                    <tr>
+                        <td>Machine ${i}</td>
+                        <td><input type="number" id="b${i}" value="0"></td>
+                        <td id="a${i}">₹ 0</td>
+                    </tr>
+                `;
+            }
+        }
+
+        function calculate() {
+            let totalBundles = 0;
+            let totalAmount = 0;
+
+            for (let i = 1; i <= MACHINE_COUNT; i++) {
+                let bundles = Number(document.getElementById("b" + i).value);
+                let amount = bundles * METRES * RATE;
+
+                document.getElementById("a" + i).innerText = "₹ " + amount;
+                totalBundles += bundles;
+                totalAmount += amount;
+            }
+
+            document.getElementById("result").innerHTML = `
+                Total Machines : ${MACHINE_COUNT}<br>
+                Total Bundles : ${totalBundles}<br>
+                Final Amount : ₹${totalAmount}
+            `;
+        }
+    </script>
+
+</body>
+
+</html>
